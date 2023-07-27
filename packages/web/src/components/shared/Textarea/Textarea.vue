@@ -1,13 +1,12 @@
 <template>
-  <textarea
-    @input="handleInput"
-    @keydown="$emit('keydown', $event)"
-    @blur="$emit('blur', $event)"
-    :value="value"
-    v-bind="$attrs"
-    ref="elementRef"
-    rows="1"
-    class="textarea"
+  <textarea 
+      @input="handleInput" 
+      @keydown="$emit('keydown', $event)" 
+      @blur="$emit('blur', $event)"
+      v-bind="$attrs" 
+      ref="elementRef" 
+      rows="1" 
+      class="textarea" 
   />
 </template>
 
@@ -19,7 +18,8 @@ export default defineComponent({
   name: 'j-textarea',
   props: {
     value: {
-      default: undefined
+      type: String,
+      default: ''
     },
     autoFocus: {
       type: Boolean,
@@ -28,8 +28,10 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const elementRef = ref<HTMLTextAreaElement>()
-    const handleInput = (e: Event) =>
+    const handleInput = (e: Event) => {
+      console.log("handle input called from textArea component", (e.target as HTMLTextAreaElement).value)
       emit('input', (e.target as HTMLTextAreaElement).value)
+    }
     onMounted(() => {
       autosize(elementRef.value as HTMLElement)
       if (props.autoFocus) {
@@ -51,15 +53,15 @@ export default defineComponent({
   border: 1px solid transparent;
   @apply border-borderLightest;
 }
+
 .textarea:hover:not(:focus) {
   @apply bg-backgroundLight;
 }
+
 .textarea:focus {
   @apply bg-white border-default border-borderInputFocus;
   box-shadow: 0 0 0 1px #4c9aff;
 }
-</style>
-<style lang="scss" scoped>
 .textarea {
   padding: 7px 7px 8px;
   line-height: 1.28;

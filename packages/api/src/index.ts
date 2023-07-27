@@ -16,7 +16,6 @@ import { apolloServerSentryPlugin } from "@/gql/plugins/sentry";
 import { formatError } from "@/errors/gqlError";
 
 const PORT = process.env.PORT || 5001;
-
 if (process.env.NODE_ENV === "production") {
   SentryInit({
     environment: process.env.APP_ENV,
@@ -34,7 +33,7 @@ const establishDatabaseConnection = async (): Promise<void> => {
   try {
     await createDatabaseConnection();
   } catch (error) {
-    console.log(error);
+    console.log("<======error at establishDatabaseConnection>index>api======>", error);
   }
 };
 
