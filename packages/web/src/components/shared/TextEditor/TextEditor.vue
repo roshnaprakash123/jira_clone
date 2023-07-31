@@ -4,10 +4,10 @@
       <div ref="editorRef"></div>
     </div>
     <div v-if="mode == 'read'" class="ql-snow">
-      <div
-        @click="enableWriteMode"
+      <div 
+        @click="enableWriteMode" 
         class="content ql-editor"
-        v-html="initialValue ? initialValue : 'Add a description'"
+        v-html="initialValue ? initialValue : 'Add a description'" 
       />
     </div>
   </div>
@@ -52,15 +52,17 @@ export default defineComponent({
       emit('changeMode', 'write')
     }
 
+    const extractTextFromHTML= (htmlCode: string) => {
+      const parser = new DOMParser();
+      const parsedHTML = parser.parseFromString(htmlCode, 'text/html');
+      const text = parsedHTML.body?.textContent?.trim();
+      return text;
+    }
+
     const insertValue = (htmlValue: string) => {
-      if (htmlValue) {
-        // Convert the HTML value to Delta format
-        const clipboardData = { html: htmlValue };
-        const delta = quill.value?.clipboard.convert(clipboardData);
-        // Set the contents of the editor using the Delta
-        if (delta) {
-          quill.value?.setContents(delta);
-        }
+      const text = extractTextFromHTML(htmlValue);
+      if (text) {
+        quill.value?.setText(text)
       }
     }
 
