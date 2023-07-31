@@ -41,7 +41,6 @@ export default defineComponent({
     const quill = ref<Quill>()
     const editorRef = ref<HTMLDivElement>()
     const initialValue = ref<string>(props.value ?? props.defaultValue ?? '')
-
     const initQuill = () => {
       return new Quill(editorRef.value as HTMLDivElement, {
         placeholder: props.placeholder,
@@ -53,9 +52,16 @@ export default defineComponent({
       emit('changeMode', 'write')
     }
 
-    const insertValue = (value: string) => {
-      quill.value?.clipboard.dangerouslyPasteHTML(0, value)
-      quill.value?.blur()
+    const insertValue = (htmlValue: string) => {
+      if (htmlValue) {
+        // Convert the HTML value to Delta format
+        const clipboardData = { html: htmlValue };
+        const delta = quill.value?.clipboard.convert(clipboardData);
+        // Set the contents of the editor using the Delta
+        if (delta) {
+          quill.value?.setContents(delta);
+        }
+      }
     }
 
     const getHTMLValue = () =>
@@ -82,7 +88,7 @@ export default defineComponent({
         insertValue(initialValue.value)
         quill.value.on('text-change', handleContentsChange)
       } catch (error) {
-        console.log(error)
+        console.log("error from onMounted ============>", error)
       }
     })
 
@@ -111,6 +117,7 @@ export default defineComponent({
     border: 1px solid #dfe1e6 !important;
     border-bottom: none !important;
   }
+
   .ql-container.ql-snow {
     color: #172b4d;
     font-size: 15px;
@@ -119,6 +126,7 @@ export default defineComponent({
     border-top: none;
   }
 }
+
 .ql-editor {
   // min-height: 110px;
   font-family: 'CircularStd', -apple-system, BlinkMacSystemFont, 'Segoe UI',
@@ -132,11 +140,13 @@ export default defineComponent({
   h6 {
     font-weight: bold;
   }
+
   img,
   video {
     display: inline-block;
   }
 }
+
 .content {
   padding: 0 !important;
   font-size: 15px;
