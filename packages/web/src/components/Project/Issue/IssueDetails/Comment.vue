@@ -23,10 +23,10 @@
       <!-- body-form -->
       <div v-if="isFormOpen">
         <j-textarea
-          v-model="newComment"
           autoFocus
           rows="2"
           @keydown="handleKeyDown"
+          @input="input"
           placeholder="Add a comment..."
         />
         <div class="flex items-center pt-2">
@@ -107,14 +107,13 @@ export default defineComponent({
     const readOnly = computed(
       () => currentUser.value.id != props.comment.userId
     )
-
     const { mutate: createMutation } = useMutation(createComment)
     const { mutate: updateMutation } = useMutation(updateComment)
 
     const handleCommentCreate = async () => {
       if (isWorking.value) return
       try {
-        isWorking.value = true
+        isWorking.value = true;
         const comment = {
           body: newComment.value,
           issueId: props.comment.issueId,
@@ -135,6 +134,12 @@ export default defineComponent({
       }
     }
 
+    const input = (value: string) => {
+         if(typeof value === 'string') {
+            newComment.value = value
+         }
+    }
+
     const handleCommentUpdate = async () => {
       if (isWorking.value) return
       try {
@@ -150,7 +155,6 @@ export default defineComponent({
         isFormOpen.value = false
         isWorking.value = false
       } catch (error) {
-        console.error(error)
         // root.$toast('Error', {
         //   type: 'error',
         //   timeout: 2500
@@ -166,6 +170,7 @@ export default defineComponent({
       props.isCreate ? handleCommentCreate() : handleCommentUpdate()
     }
     const handleKeyDown = (e: KeyboardEvent) => {
+      // find if key is enter or not shift
       if (e.keyCode == 13 && !e.shiftKey) {
         e.preventDefault()
         handleSubmit()
@@ -197,7 +202,8 @@ export default defineComponent({
       handleKeyDown,
       handleCancel,
       handleFakeTextareaClicked,
-      handleCommentUpdate
+      handleCommentUpdate,
+      input
     }
   }
 })

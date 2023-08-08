@@ -4,10 +4,10 @@
       <div ref="editorRef"></div>
     </div>
     <div v-if="mode == 'read'" class="ql-snow">
-      <div
-        @click="enableWriteMode"
+      <div 
+        @click="enableWriteMode" 
         class="content ql-editor"
-        v-html="initialValue ? initialValue : 'Add a description'"
+        v-html="initialValue ? initialValue : 'Add a description'" 
       />
     </div>
   </div>
@@ -41,7 +41,6 @@ export default defineComponent({
     const quill = ref<Quill>()
     const editorRef = ref<HTMLDivElement>()
     const initialValue = ref<string>(props.value ?? props.defaultValue ?? '')
-
     const initQuill = () => {
       return new Quill(editorRef.value as HTMLDivElement, {
         placeholder: props.placeholder,
@@ -53,9 +52,18 @@ export default defineComponent({
       emit('changeMode', 'write')
     }
 
-    const insertValue = (value: string) => {
-      quill.value?.clipboard.dangerouslyPasteHTML(0, value)
-      quill.value?.blur()
+    const extractTextFromHTML= (htmlCode: string) => {
+      const parser = new DOMParser();
+      const parsedHTML = parser.parseFromString(htmlCode, 'text/html');
+      const text = parsedHTML.body?.textContent?.trim();
+      return text;
+    }
+
+    const insertValue = (htmlValue: string) => {
+      const text = extractTextFromHTML(htmlValue);
+      if (text) {
+        quill.value?.setText(text)
+      }
     }
 
     const getHTMLValue = () =>
@@ -82,7 +90,7 @@ export default defineComponent({
         insertValue(initialValue.value)
         quill.value.on('text-change', handleContentsChange)
       } catch (error) {
-        console.log(error)
+        console.log("error from onMounted ============>", error)
       }
     })
 
@@ -111,6 +119,7 @@ export default defineComponent({
     border: 1px solid #dfe1e6 !important;
     border-bottom: none !important;
   }
+
   .ql-container.ql-snow {
     color: #172b4d;
     font-size: 15px;
@@ -119,6 +128,7 @@ export default defineComponent({
     border-top: none;
   }
 }
+
 .ql-editor {
   // min-height: 110px;
   font-family: 'CircularStd', -apple-system, BlinkMacSystemFont, 'Segoe UI',
@@ -132,11 +142,13 @@ export default defineComponent({
   h6 {
     font-weight: bold;
   }
+
   img,
   video {
     display: inline-block;
   }
 }
+
 .content {
   padding: 0 !important;
   font-size: 15px;
