@@ -11,11 +11,14 @@ import { registerTippy } from '@/plugins/tippy'
 import 'quill/dist/quill.snow.css'
 import '@/main.scss'
 
+// svg loading
 loadSprites()
 
 const app = createApp(App)
 
 registerSharedComponents(app)
+
+// is a complete tooltip, popover, dropdown, and menu solution for the web
 registerTippy(app)
 
 app.provide(DefaultApolloClient, apolloClient)

@@ -3,18 +3,11 @@ import { ArgumentValidationError } from "type-graphql";
 import { unwrapResolverError } from "@apollo/server/errors";
 import type { ValidationError as ClassValidatorValidationError } from "class-validator";
 
-export function formatError(
-  formattedError: GraphQLFormattedError,
-  error: unknown
-): GraphQLFormattedError {
+export function formatError(formattedError: GraphQLFormattedError, error: unknown): GraphQLFormattedError {
   const originalError = unwrapResolverError(error);
 
   // Log
-  console.log(
-    `Server error: ${
-      originalError instanceof Error ? originalError.message : originalError
-    }`
-  );
+  console.log(`Server error: ${originalError instanceof Error ? originalError.message : originalError}`);
 
   // Validation
   if (originalError instanceof ArgumentValidationError) {
@@ -25,14 +18,9 @@ export function formatError(
   return formattedError;
 }
 
-type IValidationError = Pick<
-  ClassValidatorValidationError,
-  "property" | "value" | "constraints" | "children"
->;
+type IValidationError = Pick<ClassValidatorValidationError, "property" | "value" | "constraints" | "children">;
 
-function formatValidationErrors(
-  validationError: IValidationError
-): IValidationError {
+function formatValidationErrors(validationError: IValidationError): IValidationError {
   return {
     property: validationError.property,
     ...(validationError.value && { value: validationError.value }),
@@ -41,10 +29,10 @@ function formatValidationErrors(
     }),
     ...(validationError.children &&
       validationError.children.length !== 0 && {
-        children: validationError.children.map((child) =>
-          formatValidationErrors(child)
-        ),
-      }),
+      children: validationError.children.map((child) =>
+        formatValidationErrors(child)
+      ),
+    }),
   };
 }
 

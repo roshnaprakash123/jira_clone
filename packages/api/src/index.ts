@@ -34,7 +34,7 @@ const establishDatabaseConnection = async (): Promise<void> => {
   try {
     await createDatabaseConnection();
   } catch (error) {
-    console.log(error);
+    console.log("<==================Error at createDatabaseConnection=================>", error);
   }
 };
 

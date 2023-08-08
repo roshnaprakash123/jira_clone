@@ -5,6 +5,7 @@ export const catchErrors = (requestHandler: RequestHandler): RequestHandler => {
     try {
       return await requestHandler(req, res, next);
     } catch (error) {
+      console.log("<===========error at api > src > errors > catchErrors ===================>", error);
       next(error);
     }
   };

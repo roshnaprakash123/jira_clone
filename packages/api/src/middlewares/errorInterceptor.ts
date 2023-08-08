@@ -7,7 +7,7 @@ export const ErrorInterceptor: MiddlewareFn<GQLContext> = async (_, next) => {
   try {
     return await next();
   } catch (error) {
-    console.error(error);
+    console.error("<===============api > middlewares > ErrorInterceptor================>", error);
     const isErrorSafeForClient = error instanceof CustomError;
 
     if (isErrorSafeForClient) {
@@ -21,7 +21,7 @@ export const ErrorInterceptor: MiddlewareFn<GQLContext> = async (_, next) => {
 
     throw new CustomError(
       "Something went wrong, please contact our support.",
-      "INTERNAL_ERROR",
+      "INTERNAL_ERROR @ api > middlewares > ErrorInterceptor",
       500,
       {}
     );
