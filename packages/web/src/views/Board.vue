@@ -3,13 +3,13 @@
     <j-breadcrumbs :items="['Projects', project.name, 'Kanban Board']" />
     <header class="mt-3 flex justify-between text-textDarkest">
       <div class="text-2xl font-medium">Kanban board</div>
-      <a
+      <!-- <a
         href="https://github.com/Datlyfe/jira_clone"
         target="_blank"
         rel="noreferrer noopener"
       >
         <j-button variant="secondary" icon="github">Github Repo</j-button>
-      </a>
+      </a> -->
     </header>
     <appFilters @change="handleFiltersChange" />
     <Lists />

@@ -6,9 +6,14 @@ import { fetchMe } from '@/graphql/queries/auth'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/',
+    path: '/auth',
     name: 'root',
-    redirect: 'project'
+    redirect: 'auth'
+  },
+  {
+    path: '/auth',
+    meta: { requiresAuth: true },
+    component: () => import('@/views/Auth.vue'),
   },
   {
     path: '/project',
@@ -41,8 +46,10 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, _, next) => {
+  console.log("to ==============>", to.name)
   if (to.matched.some(routeRecord => routeRecord.meta.requiresAuth)) {
     if (!store.getters.isAuthenticated()) {
+      console.log("from if ================>")
       await authenticate()
       next({ name: to.name || 'root' })
     } else {

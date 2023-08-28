@@ -1,5 +1,6 @@
 <template>
   <div id="root">
+    <Login v-if="!isAppReady"/>
     <Modals />
     <PageLoader v-if="!isAppReady" />
     <div id="app-frame">
@@ -18,12 +19,14 @@ import Modals from '@/components/Modals/Modals.vue'
 import { useQuery } from '@vue/apollo-composable'
 import { getProjectWithUsersAndIssues } from '@/graphql/queries/project'
 import { mutations, getters } from './store'
+import Login from './views/Auth.vue'
 export default defineComponent({
   components: {
     Navigation,
     PageLoader,
     ErrorPage,
-    Modals
+    Modals,
+    Login
   },
   setup() {
     const expanded = ref<boolean>(true)
