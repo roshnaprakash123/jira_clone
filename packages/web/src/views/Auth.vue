@@ -17,80 +17,73 @@
 
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             <form class="space-y-6" action="#" method="POST">
-                <div>
-                    <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
+                <div v-for="(field, i) in fields">
+                    <label :for="field.name" class="block text-sm font-medium leading-6 text-gray-900">
+                        {{ field.label }}
+                    </label>
                     <div class="mt-2">
-                        <j-input :value="email" @input="handleChange" />
+                        <j-input v-model="field.reference.value" :name="field.name"
+                            @inputChange="handleChange($event, i)" />
                     </div>
                 </div>
-
                 <div>
-                    <div class="flex items-center">
-                        <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
-                    </div>
-                    <div class="mt-2">
-                        <j-input :value="password" @input="handleChange" />
-                    </div>
-                    <div class="text-sm">
-                        <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
-                    </div>
-                </div>
-
-                <div>
-                    <j-button :isWorking="isWorking" @click="handleConfirmed" class="mr-2">Sign
-                        in</j-button>
+                    <j-button :isWorking="isWorking" @click="handleConfirmed" class="mr-2">Sign in</j-button>
                 </div>
             </form>
         </div>
     </div>
 </template>
 <script lang="ts">
-import { ref, defineComponent, onUnmounted } from 'vue'
+import { ref, defineComponent, onUnmounted } from 'vue';
+import { authenticate } from '@/auth/authenticate'
+import { fetchMe } from '@/graphql/queries/auth'
+import store from '@/store'
+import { useRouter } from 'vue-router'
+
 export default defineComponent({
-    //   props: {
-    //     title: {
-    //       type: String,
-    //       required: true
-    //     },
-    //     message: {
-    //       type: String,
-    //       default: undefined
-    //     },
-    //     confirmText: {
-    //       type: String,
-    //       default: 'Confirm'
-    //     },
-    //     variant: {
-    //       type: String,
-    //       default: 'primary'
-    //     }
-    //   },
     setup(_, { emit }) {
         const isWorking = ref<boolean>(false);
-        const email = ref<string>('');
-        const password = ref<string>('');
-        const handleConfirmed = () => {
-            if (isWorking.value) return
-            isWorking.value = true
-            emit('confirm')
-        }
-        const handleClose = () => emit('close')
+        const changedFields: { [key: string]: string } = {};
+        const router = useRouter();
+        type Ref<T> = {
+            value: T;
+        };
+
+        const fields: Array<{ name: string, reference: Ref<string>, label: string }> = [
+            { name: 'email', reference: { value: '' }, label: 'Email address' },
+            { name: 'password', reference: { value: '' }, label: 'Password' }
+        ];
+
+        const handleChange = (event: string, i: number) => {
+            fields[i].reference.value = event;
+
+        };
+
+        const handleConfirmed = async () => {
+            fields.map(field => {
+                changedFields[field.name] = field.reference.value
+            })
+            console.log('changedFields:', changedFields);
+            await authenticate()
+            if (isWorking.value) return;
+            isWorking.value = true;
+            emit('confirm');
+            console.log("isAuthenticated from handleConfirmed", store.getters.isAuthenticated())
+            if (store.getters.isAuthenticated()) {
+                // const route = useRoute()
+                router.push({ path: '/project' })
+            }
+        };
 
         onUnmounted(() => {
             isWorking.value = false
         })
 
-        const handleChange = (e) => {
-            console.log("email>>", e);
-        }
-
         return {
-            isWorking,
-            handleClose,
             handleConfirmed,
             handleChange,
-            email,
-            password
+            fields,
+            isWorking
         }
     }
 })
