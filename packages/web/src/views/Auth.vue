@@ -27,32 +27,56 @@
                     </div>
                 </div>
                 <div>
-                    <j-button :isWorking="isWorking" @click="handleConfirmed" class="mr-2">Sign in</j-button>
+                    <j-button :isWorking="isWorking" @click="handleConfirmed" class="mr-2">{{ option[0] }}</j-button>
+                </div>
+                <div class="options">
+                    <span>{{ userChoiceText }}</span>
+                    <button @click="changeButton">{{ option[1] }}</button>
                 </div>
             </form>
         </div>
     </div>
 </template>
 <script lang="ts">
-import { ref, defineComponent, onUnmounted } from 'vue';
+import { ref, watch, defineComponent, onUnmounted } from 'vue';
 import { authenticate } from '@/auth/authenticate'
-import { fetchMe } from '@/graphql/queries/auth'
 import store from '@/store'
 import { useRouter } from 'vue-router'
 
 export default defineComponent({
     setup(_, { emit }) {
+        console.log("i'm from Auth")
         const isWorking = ref<boolean>(false);
         const changedFields: { [key: string]: string } = {};
         const router = useRouter();
+        const userChoiceText = ref<string>('New here ?');
+        const option = ref<string[]>(['Sign In', 'Sign Up']);
+        const isChanged = ref<boolean>(false);
         type Ref<T> = {
             value: T;
         };
+
+        watch(isChanged, (newValue: boolean) => {
+            if (newValue) {
+                option.value[0] = 'Sign Up';
+                option.value[1] = 'Sign In';
+                userChoiceText.value = 'Already have account ?'
+            } else {
+                option.value[0] = 'Sign In';
+                option.value[1] = 'Sign Up';
+                userChoiceText.value = 'New here ?'
+            }
+        })
 
         const fields: Array<{ name: string, reference: Ref<string>, label: string }> = [
             { name: 'email', reference: { value: '' }, label: 'Email address' },
             { name: 'password', reference: { value: '' }, label: 'Password' }
         ];
+
+        const changeButton = (event: Event) => {
+            event.preventDefault();
+            isChanged.value = !isChanged.value;
+        }
 
         const handleChange = (event: string, i: number) => {
             fields[i].reference.value = event;
@@ -63,12 +87,10 @@ export default defineComponent({
             fields.map(field => {
                 changedFields[field.name] = field.reference.value
             })
-            console.log('changedFields:', changedFields);
             await authenticate()
             if (isWorking.value) return;
             isWorking.value = true;
             emit('confirm');
-            console.log("isAuthenticated from handleConfirmed", store.getters.isAuthenticated())
             if (store.getters.isAuthenticated()) {
                 // const route = useRoute()
                 router.push({ path: '/project' })
@@ -82,9 +104,20 @@ export default defineComponent({
         return {
             handleConfirmed,
             handleChange,
+            changeButton,
             fields,
-            isWorking
+            isWorking,
+            userChoiceText,
+            option,
+            isChanged
         }
     }
 })
 </script>
+
+<style scoped>
+.options {
+    display: flex;
+    justify-content: space-between;
+}
+</style>
