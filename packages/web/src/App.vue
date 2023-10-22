@@ -1,7 +1,7 @@
 <template>
   <div id="root">
-    <Login v-if="!isAppReady"/>
     <Modals />
+    <Login v-if="!isAppReady"/>
     <PageLoader v-if="!isAppReady" />
     <div id="app-frame">
       <router-view></router-view>

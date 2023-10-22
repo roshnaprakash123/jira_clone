@@ -18,10 +18,10 @@
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             <form class="space-y-6" action="#" method="POST">
                 <div v-for="(field, i) in fields">
-                    <label :for="field.name" class="block text-sm font-medium leading-6 text-gray-900">
+                    <label v-if="field.show" :for="field.name" class="block text-sm font-medium leading-6 text-gray-900">
                         {{ field.label }}
                     </label>
-                    <div class="mt-2">
+                    <div class="mt-2" v-if="field.show">
                         <j-input v-model="field.reference.value" :name="field.name"
                             @inputChange="handleChange($event, i)" />
                     </div>
@@ -58,19 +58,22 @@ export default defineComponent({
 
         watch(isChanged, (newValue: boolean) => {
             if (newValue) {
+                fields[0].show = true;
                 option.value[0] = 'Sign Up';
                 option.value[1] = 'Sign In';
                 userChoiceText.value = 'Already have account ?'
             } else {
+                fields[0].show = false;
                 option.value[0] = 'Sign In';
                 option.value[1] = 'Sign Up';
                 userChoiceText.value = 'New here ?'
             }
         })
 
-        const fields: Array<{ name: string, reference: Ref<string>, label: string }> = [
-            { name: 'email', reference: { value: '' }, label: 'Email address' },
-            { name: 'password', reference: { value: '' }, label: 'Password' }
+        const fields: Array<{ name: string, reference: Ref<string>, label: string, show: boolean }> = [
+            { name: 'username', reference: { value: '' }, label: 'Username', show: false },
+            { name: 'email', reference: { value: '' }, label: 'Email address', show: true },
+            { name: 'password', reference: { value: '' }, label: 'Password', show: true }
         ];
 
         const changeButton = (event: Event) => {
