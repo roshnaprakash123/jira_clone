@@ -3,22 +3,24 @@
     <div v-if="icon" class="inputIconContainer">
       <j-icon :size="iconSize" :name="icon"></j-icon>
     </div>
-    <input
-      :class="['input', { invalid, hasIcon: icon }]"
-      v-bind="$attrs"
-      :value="value"
-      @input="handleInput"
-      @blur="handleBlur"
-    />
+    <input :class="['input', { invalid, hasIcon: icon }]" :type="type" v-bind="$attrs" :name="name" :value="value"
+      @input="handleInput" @blur="handleBlur" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { ref, defineComponent, computed, Ref } from 'vue';
+interface ChangedInputs {
+  [key: string]: string
+}
 export default defineComponent({
   name: 'j-input',
   inheritAttrs: false,
   props: {
+    type: {
+      type: String,
+      default: null
+    },
     value: {
       type: [String, Number],
       default: undefined
@@ -37,18 +39,29 @@ export default defineComponent({
     },
     filter: {
       default: undefined
+    },
+    name: {
+      type: String,
+      default: ''
     }
   },
   setup(props, { emit }) {
+    const changedInputs: Ref<ChangedInputs> = ref({})
+
     const handleInput = (event: Event) => {
-      emit('input', (event.currentTarget as HTMLInputElement).value)
+      const inputElement = event.currentTarget as HTMLInputElement
+      changedInputs.value[inputElement.name] = inputElement.value
+      emit('inputChange', inputElement.value)
     }
+
     const handleBlur = (event: FocusEvent) => {
       emit('blur', (event.currentTarget as HTMLInputElement).value)
     }
+
     const Iconstyles = computed(() => ({
       '--iconContainerWidth': props.iconSize * 2 + 'px'
     }))
+
     return {
       handleInput,
       handleBlur,
@@ -65,6 +78,7 @@ export default defineComponent({
   height: 32px;
   width: 100%;
 }
+
 .input {
   height: 100%;
   width: 100%;
@@ -75,26 +89,32 @@ export default defineComponent({
   color: #172b4d;
   transition: background 0.1s;
   font-size: 15px;
+
   &:hover {
     background: #ebecf0;
   }
+
   &:focus {
     background: #fff;
     border: 1px solid #4c9aff;
     box-shadow: 0 0 0 1px #4c9aff;
     outline: none;
   }
+
   &::placeholder {
     font-size: 14px;
   }
 }
+
 .invalid {
+
   &,
   &:focus {
     border: 1px solid #e13c3c;
     box-shadow: none;
   }
 }
+
 .hasIcon {
   padding-left: var(--iconContainerWidth);
 }
@@ -114,6 +134,7 @@ export default defineComponent({
 .inputContainer {
   &.flat {
     height: 40px;
+
     .input {
       border: none;
       border-bottom: 2px solid #0052cc;
@@ -124,6 +145,7 @@ export default defineComponent({
         @apply text-textLight;
         font-size: 21px;
       }
+
       &:focus,
       &:hover {
         border: none;

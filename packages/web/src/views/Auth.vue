@@ -1,28 +1,22 @@
 <template>
-    <!--
-      This example requires updating your template:
-  
-      ```
-      <html class="h-full bg-white">
-      <body class="h-full">
-      ```
-    -->
     <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div class="sm:mx-auto sm:w-full sm:max-w-sm">
             <img class="mx-auto h-10 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
                 alt="Your Company" />
-            <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account
+            <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your
+                account
             </h2>
         </div>
 
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             <form class="space-y-6" action="#" method="POST">
                 <div v-for="(field, i) in fields">
-                    <label v-if="field.show" :for="field.name" class="block text-sm font-medium leading-6 text-gray-900">
+                    <label v-if="field.show" :for="field.name"
+                        class="block text-sm font-medium leading-6 text-gray-900">
                         {{ field.label }}
                     </label>
                     <div class="mt-2" v-if="field.show">
-                        <j-input v-model="field.reference.value" :name="field.name"
+                        <j-input v-model="field.reference.value" :name="field.name" :type="field.type"
                             @inputChange="handleChange($event, i)" />
                     </div>
                 </div>
@@ -70,10 +64,10 @@ export default defineComponent({
             }
         })
 
-        const fields: Array<{ name: string, reference: Ref<string>, label: string, show: boolean }> = [
-            { name: 'username', reference: { value: '' }, label: 'Username', show: false },
-            { name: 'email', reference: { value: '' }, label: 'Email address', show: true },
-            { name: 'password', reference: { value: '' }, label: 'Password', show: true }
+        const fields: Array<{ name: string, reference: Ref<string>, label: string, show: boolean, type: string }> = [
+            { name: 'username', reference: { value: '' }, label: 'Username', show: false, type: 'text' },
+            { name: 'email', reference: { value: '' }, label: 'Email address', show: true, type: 'text' },
+            { name: 'password', reference: { value: '' }, label: 'Password', show: true, type: 'password' }
         ];
 
         const changeButton = (event: Event) => {
@@ -90,17 +84,17 @@ export default defineComponent({
             fields.map(field => {
                 changedFields[field.name] = field.reference.value
             })
-            await authenticate()
+            await authenticate(changedFields)
             if (isWorking.value) return;
             isWorking.value = true;
             emit('confirm');
             if (store.getters.isAuthenticated()) {
-                // const route = useRoute()
                 router.push({ path: '/project' })
             }
         };
 
         onUnmounted(() => {
+            console.log("component unmounted");
             isWorking.value = false
         })
 
