@@ -93,7 +93,6 @@ export default defineComponent({
         };
 
         onUnmounted(() => {
-            console.log("component unmounted");
             isWorking.value = false
         })
 

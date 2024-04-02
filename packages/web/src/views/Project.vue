@@ -24,7 +24,6 @@ export default defineComponent({
     ErrorPage
   },
   setup() {
-    console.log("Now route in project")
 
     const { loading, result, error, onError } = useQuery(
       getProjectWithUsersAndIssues,
@@ -45,7 +44,6 @@ export default defineComponent({
 
     matchHandler(match)
     match.addListener(matchHandler)
-    console.log("before useQuery", getProjectWithUsersAndIssues)
 
     watch(result, (value) => {
       console.log("value from watch", value)
