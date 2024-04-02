@@ -1,7 +1,7 @@
 <template>
   <div id="root">
     <Modals />
-    <Login v-if="!isAppReady"/>
+    <Login v-if="!isAppReady" />
     <PageLoader v-if="!isAppReady" />
     <div id="app-frame">
       <router-view></router-view>
@@ -16,9 +16,7 @@ import Navigation from '@/components/Navigation/Navigation.vue'
 import PageLoader from '@/components/Loader.vue'
 import ErrorPage from '@/components/ErrorPage.vue'
 import Modals from '@/components/Modals/Modals.vue'
-import { useQuery } from '@vue/apollo-composable'
-import { getProjectWithUsersAndIssues } from '@/graphql/queries/project'
-import { mutations, getters } from './store'
+import { getters } from './store'
 import Login from './views/Auth.vue'
 export default defineComponent({
   components: {
@@ -34,11 +32,7 @@ export default defineComponent({
       expanded.value = isExpanded
     }
 
-    const isAppReady = computed(
-      () =>
-        getters.isAuthenticated() &&
-        Object.keys(getters.currentUser()).length !== 0
-    )
+    const isAppReady = computed(() => getters.isAuthenticated() && Object.keys(getters.currentUser()).length !== 0)
 
     const getContentStyles = computed(() => ({
       'padding-left': `${expanded.value ? 240 : 20}` + 'px',
@@ -52,23 +46,9 @@ export default defineComponent({
     matchHandler(match)
     match.addListener(matchHandler)
 
-    const { loading, onResult, error } = useQuery(
-      getProjectWithUsersAndIssues,
-      {},
-      { fetchPolicy: 'no-cache' }
-    )
-
-    onResult(res => {
-      const { data } = res as any
-      if (data) {
-        mutations.setProject(data.getProjectWithUsersAndIssues)
-      }
-    })
 
     return {
       isAppReady,
-      loading,
-      error,
       expanded,
       handleNavigationResize,
       getContentStyles

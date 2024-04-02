@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, ref, computed, watch } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import { mutations } from '@/store'
 import { getProjectWithUsersAndIssues } from '@/graphql/queries/project'
@@ -24,6 +24,12 @@ export default defineComponent({
     ErrorPage
   },
   setup() {
+    console.log("Now route in project")
+
+    const { loading, result, error, onError } = useQuery(
+      getProjectWithUsersAndIssues,
+      {},
+    );
     const expanded = ref<boolean>(true)
     const handleNavigationResize = (isExpanded: boolean) => {
       expanded.value = isExpanded
@@ -35,25 +41,19 @@ export default defineComponent({
     }))
 
     const match = window.matchMedia('(max-width: 1100px)')
-    const matchHandler = (e: MediaQueryListEventInit) =>
-      (expanded.value = !e.matches)
+    const matchHandler = (e: MediaQueryListEventInit) => (expanded.value = !e.matches)
 
     matchHandler(match)
     match.addListener(matchHandler)
+    console.log("before useQuery", getProjectWithUsersAndIssues)
 
-    const { loading, onResult, error } = useQuery(
-      getProjectWithUsersAndIssues,
-      {},
-      { fetchPolicy: 'no-cache' }
-    )
+    watch(result, (value) => {
+      console.log("value from watch", value)
+      mutations.setProject(value.getProjectWithUsersAndIssues);
+    })
 
-    onResult(res => {
-      if (res) {
-        const { data } = res
-        if (data) {
-          mutations.setProject(data.getProjectWithUsersAndIssues)
-        }
-      }
+    onError(err => {
+      console.log("err while fetching project", err)
     })
 
     return {

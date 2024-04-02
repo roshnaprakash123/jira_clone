@@ -38,7 +38,7 @@ import store from '@/store'
 import { useRouter } from 'vue-router'
 
 export default defineComponent({
-    setup(_, { emit }) {
+    setup(_) {
         console.log("i'm from Auth")
         const isWorking = ref<boolean>(false);
         const changedFields: { [key: string]: string } = {};
@@ -87,7 +87,6 @@ export default defineComponent({
             await authenticate(changedFields)
             if (isWorking.value) return;
             isWorking.value = true;
-            emit('confirm');
             if (store.getters.isAuthenticated()) {
                 router.push({ path: '/project' })
             }
